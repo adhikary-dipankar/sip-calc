@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIP Calculator with Advanced Features</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        .glass-effect {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #3a41c8 0%, #6f23b8 50%, #d51e5a 100%);
+            background-size: 200% 200%;
+            animation: gradient 15s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .invested-amount {
+            border-left: 5px solid #4ade80;
+        }
+        .estimated-returns {
+            border-left: 5px solid #3b82f6;
+        }
+        .total-value {
+            border-left: 5px solid #9333ea;
+        }
+        .hover-effect {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .hover-effect:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen p-4 md:p-8 text-white">
+    <div class="max-w-6xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">Advanced SIP Calculator</h1>
+            <p class="text-lg opacity-90">Calculate your Systematic Investment Plan returns with top-up and year-wise breakdown</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <!-- Input Section -->
+            <div class="glass-effect p-6 lg:col-span-2 hover-effect">
+                <h2 class="text-2xl font-semibold mb-4">Investment Details</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block mb-1 text-sm">Monthly Investment (₹)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300">₹</span>
+                            <input type="number" id="monthlyInvestment" class="w-full pl-8 p-3 rounded-lg bg-gray-800 bg-opacity-50 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all duration-300" value="5000">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-sm">Investment Period (Years)</label>
+                        <input type="number" id="investmentPeriod" class="w-full p-3 rounded-lg bg-gray-800 bg-opacity-50 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" value="10">
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-sm">Expected Return Rate (% p.a.)</label>
+                        <input type="number" id="expectedReturn" class="w-full p-3 rounded-lg bg-gray-800 bg-opacity-50 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" value="12">
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-sm">Top-up Percentage (% p.a.)</label>
+                        <input type="number" id="topUpPercentage" class="w-full p-3 rounded-lg bg-gray-800 bg-opacity-50 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" value="10">
+                        <p class="text-xs mt-1 opacity-70">Your SIP amount will increase by this percentage every year</p>
+                    </div>
+                    <button onclick="calculateSIP()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-medium transition duration-200">
+                        Calculate
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="glass-effect p-6 lg:col-span-3 hover-effect">
+                <!-- Multi-Fund Comparison Section -->
+                <div class="mb-8 p-4 bg-gray-800 bg-opacity-30 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-3">Compare Multiple Funds</h3>
+                    <div class="flex flex-wrap gap-3 mb-4" id="fundInputs">
+                        <div class="flex-grow">
+                            <select class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600">
+                                <option>Select Fund 1</option>
+                                <option>Large Cap Equity Fund</option>
+                                <option>Mid Cap Fund</option>
+                                <option>Small Cap Fund</option>
+                            </select>
+                        </div>
+                        <button onclick="addFundInput()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+                            + Add Fund
+                        </button>
+                    </div>
+                    <div class="relative h-64">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-semibold">Results</h2>
+                    <div class="flex space-x-2">
+                        <button onclick="exportToPDF()" class="bg-pink-600 hover:bg-pink-700 text-white py-2 px-3 rounded-lg text-sm transition duration-200">
+                            Export PDF
+                        </button>
+                        <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-lg text-sm transition duration-200">
+                            Export Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg invested-amount">
+                        <p class="text-gray-300 text-sm">Invested Amount</p>
+                        <p id="totalInvested" class="text-2xl font-bold">₹0</p>
+                    </div>
+                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg estimated-returns">
+                        <p class="text-gray-300 text-sm">Estimated Returns</p>
+                        <p id="estimatedReturns" class="text-2xl font-bold">₹0</p>
+                    </div>
+                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg total-value">
+                        <p class="text-gray-300 text-sm">Total Value</p>
+                        <p id="totalValue" class="text-2xl font-bold">₹0</p>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="mb-6">
+                    <canvas id="sipChart" height="250"></canvas>
+                </div>
+
+                <!-- Year-wise Breakdown -->
+                <div class="overflow-x-auto">
+                    <h3 class="text-lg font-medium mb-3">Year-wise Breakdown</h3>
+                    <table class="w-full bg-gray-800 bg-opacity-50 rounded-lg overflow-hidden">
+                        <thead class="bg-gray-900 bg-opacity-50">
+                            <tr>
+                                <th class="p-3 text-left">Year</th>
+                                <th class="p-3 text-right">Invested</th>
+                                <th class="p-3 text-right">Returns</th>
+                                <th class="p-3 text-right">Total Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="yearlyBreakdown" class="divide-y divide-gray-700">
+                            <!-- Data will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-sm opacity-70">
+            <p>Disclaimer: This calculator provides estimates only. Actual returns may vary.</p>
+        </footer>
+    </div>
+
+    <script>
+        let sipChart = null;
+        let calculatedData = null;
+
+        function calculateSIP() {
+            const monthlyInvestment = parseFloat(document.getElementById('monthlyInvestment').value) || 0;
+            const investmentPeriod = parseInt(document.getElementById('investmentPeriod').value) || 0;
+            const expectedReturn = parseFloat(document.getElementById('expectedReturn').value) || 0;
+            const topUpPercentage = parseFloat(document.getElementById('topUpPercentage').value) || 0;
+
+            const monthlyRate = expectedReturn / 12 / 100;
+            let currentMonthlyInvestment = monthlyInvestment;
+            let totalInvested = 0;
+            let totalValue = 0;
+            let yearlyData = [];
+            
+            for (let year = 1; year <= investmentPeriod; year++) {
+                let yearInvested = 0;
+                let yearStartValue = totalValue;
+                
+                // Calculate for each month in the year
+                for (let month = 1; month <= 12; month++) {
+                    totalInvested += currentMonthlyInvestment;
+                    yearInvested += currentMonthlyInvestment;
+                    
+                    // Calculate returns on previous balance
+                    if (month > 1 || year > 1) {
+                        totalValue = totalValue * (1 + monthlyRate);
+                    }
+                    
+                    // Add current month's investment
+                    totalValue += currentMonthlyInvestment;
+                }
+                
+                // Apply top-up for next year
+                if (year < investmentPeriod) {
+                    currentMonthlyInvestment = currentMonthlyInvestment * (1 + (topUpPercentage / 100));
+                }
+                
+                // Store year data
+                const yearReturns = totalValue - yearStartValue - yearInvested;
+                yearlyData.push({
+                    year,
+                    invested: yearInvested,
+                    returns: yearReturns,
+                    totalValue: totalValue
+                });
+            }
+            
+            const estimatedReturns = totalValue - totalInvested;
+            
+            // Update summary
+            document.getElementById('totalInvested').textContent = '₹' + formatNumber(totalInvested);
+            document.getElementById('estimatedReturns').textContent = '₹' + formatNumber(estimatedReturns);
+            document.getElementById('totalValue').textContent = '₹' + formatNumber(totalValue);
+            
+            // Update yearly breakdown
+            updateYearlyBreakdown(yearlyData);
+            
+            // Update chart
+            updateChart(yearlyData);
+            
+            // Store calculated data for export
+            calculatedData = {
+                monthlyInvestment,
+                investmentPeriod,
+                expectedReturn,
+                topUpPercentage,
+                totalInvested,
+                estimatedReturns,
+                totalValue,
+                yearlyData
+            };
+        }
+        
+        function updateYearlyBreakdown(yearlyData) {
+            const tbody = document.getElementById('yearlyBreakdown');
+            tbody.innerHTML = '';
+            
+            yearlyData.forEach(data => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-700 hover:bg-opacity-30';
+                row.innerHTML = `
+                    <td class="p-3">${data.year}</td>
+                    <td class="p-3 text-right">₹${formatNumber(data.invested)}</td>
+                    <td class="p-3 text-right">₹${formatNumber(data.returns)}</td>
+                    <td class="p-3 text-right">₹${formatNumber(data.totalValue)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function updateChart(yearlyData) {
+            const ctx = document.getElementById('sipChart').getContext('2d');
+            
+            // Destroy previous chart if exists
+            if (sipChart) {
+                sipChart.destroy();
+            }
+            
+            // Prepare data for chart
+            const labels = yearlyData.map(data => `Year ${data.year}`);
+            const investedData = yearlyData.map(data => data.invested);
+            const returnsData = yearlyData.map(data => data.returns);
+            
+            sipChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Invested Amount',
+                            data: investedData,
+                            backgroundColor: 'rgba(74, 222, 128, 0.7)',
+                            borderColor: 'rgba(74, 222, 128, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Estimated Returns',
+                            data: returnsData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.9)'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + formatNumber(context.raw);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                callback: function(value) {
+                                    return '₹' + formatNumber(value);
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function formatNumber(num) {
+            return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        function exportToPDF() {
+            if (!calculatedData) {
+                alert('Please calculate SIP first');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(20);
+            doc.text('SIP Investment Report', 105, 20, { align: 'center' });
+            
+            // Add summary
+            doc.setFontSize(12);
+            doc.text('Input Parameters:', 15, 30);
+            doc.text(`Monthly Investment: ₹${formatNumber(calculatedData.monthlyInvestment)}`, 15, 40);
+            doc.text(`Investment Period: ${calculatedData.investmentPeriod} years`, 15, 45);
+            doc.text(`Expected Return: ${calculatedData.expectedReturn}% p.a.`, 15, 50);
+            doc.text(`Top-up Percentage: ${calculatedData.topUpPercentage}% p.a.`, 15, 55);
+            
+            doc.text('Summary Results:', 15, 70);
+            doc.text(`Total Invested Amount: ₹${formatNumber(calculatedData.totalInvested)}`, 15, 80);
+            doc.text(`Estimated Returns: ₹${formatNumber(calculatedData.estimatedReturns)}`, 15, 85);
+            doc.text(`Total Value: ₹${formatNumber(calculatedData.totalValue)}`, 15, 90);
+            
+            // Add chart image (simplified as actual chart export would need more complex handling)
+            doc.text('Investment Growth:', 15, 105);
+            doc.text('(Chart image would be embedded here in full implementation)', 15, 115);
+            
+            // Add yearly breakdown table
+            const headers = ['Year', 'Invested', 'Returns', 'Total Value'];
+            const data = calculatedData.yearlyData.map(row => [
+                row.year,
+                '₹' + formatNumber(row.invested),
+                '₹' + formatNumber(row.returns),
+                '₹' + formatNumber(row.totalValue)
+            ]);
+            
+            doc.autoTable({
+                startY: 125,
+                head: [headers],
+                body: data,
+                theme: 'grid',
+                headStyles: { fillColor: [59, 130, 246] },
+                styles: { font: 'helvetica', fontSize: 10 }
+            });
+            
+            // Save PDF
+            doc.save('SIP-Report.pdf');
+        }
+        
+        function exportToExcel() {
+            if (!calculatedData) {
+                alert('Please calculate SIP first');
+                return;
+            }
+            
+            // Create data array
+            const data = [
+                ['SIP Investment Report'],
+                [''],
+                ['Input Parameters:'],
+                ['Monthly Investment', `₹${formatNumber(calculatedData.monthlyInvestment)}`],
+                ['Investment Period', `${calculatedData.investmentPeriod} years`],
+                ['Expected Return', `${calculatedData.expectedReturn}% p.a.`],
+                ['Top-up Percentage', `${calculatedData.topUpPercentage}% p.a.`],
+                [''],
+                ['Summary Results:'],
+                ['Total Invested Amount', `₹${formatNumber(calculatedData.totalInvested)}`],
+                ['Estimated Returns', `₹${formatNumber(calculatedData.estimatedReturns)}`],
+                ['Total Value', `₹${formatNumber(calculatedData.totalValue)}`],
+                [''],
+                ['Year-wise Breakdown:'],
+                ['Year', 'Invested', 'Returns', 'Total Value'],
+                ...calculatedData.yearlyData.map(row => [
+                    row.year,
+                    '₹' + formatNumber(row.invested),
+                    '₹' + formatNumber(row.returns),
+                    '₹' + formatNumber(row.totalValue)
+                ])
+            ];
+            
+            // Create workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // Calculate range for borders
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            
+            // Apply styling to headers and title
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                if (C === 0 || data[range.s.r][C] === 'Year') {
+                    // Make headers bold
+                    const cell_address = { c: C, r: range.s.r };
+                    const cell_ref = XLSX.utils.encode_cell(cell_address);
+                    ws[cell_ref].s = { font: { bold: true } };
+                }
+            }
+            
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, "SIP Report");
+            
+            // Export
+            XLSX.writeFile(wb, 'SIP-Report.xlsx');
+        }
+        
+        // Fund Comparison Functions
+        function addFundInput() {
+            const container = document.getElementById('fundInputs');
+            const count = container.querySelectorAll('select').length + 1;
+            
+            if(count > 3) {
+                alert('Maximum 3 funds can be compared');
+                return;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'flex-grow';
+            div.innerHTML = `
+                <select class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600">
+                    <option>Select Fund ${count}</option>
+                    <option>Large Cap Equity Fund</option>
+                    <option>Mid Cap Fund</option>
+                    <option>Small Cap Fund</option>
+                    <option>Index Fund</option>
+                    <option>Sectoral Fund</option>
+                </select>
+            `;
+            container.insertBefore(div, container.lastElementChild);
+        }
+
+        // Initialize the calculator on page load
+        window.onload = function() {
+            calculateSIP();
+            // Initialize comparison chart
+            new Chart(document.getElementById('comparisonChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['1Y', '3Y', '5Y', '7Y', '10Y'],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+</html>
+
