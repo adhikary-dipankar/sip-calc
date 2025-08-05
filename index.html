@@ -385,7 +385,7 @@
 
             doc.setFontSize(10);
             doc.setTextColor(darkText[0], darkText[1], darkText[2]);
-            doc.text(`A. Monthly Investment (\u20B9): ${formatNumber(calculatedData.monthlyInvestment)}`, 15, 32);
+            doc.text(`A. Monthly Investment (INR): ${formatNumber(calculatedData.monthlyInvestment)}`, 15, 32);
             doc.text(`B. Investment Period (Years): ${calculatedData.investmentPeriod}`, 15, 38);
             doc.text(`C. Expected Return Rate (%): ${calculatedData.expectedReturn}`, 15, 44);
             doc.text(`D. Top-up Percentage (%): ${calculatedData.topUpPercentage}`, 15, 50);
@@ -397,12 +397,12 @@
 
             doc.setFontSize(10);
             doc.setTextColor(darkText[0], darkText[1], darkText[2]);
-            doc.text(`✔ Total Invested Amount (\u20B9): ${formatNumber(calculatedData.totalInvested)}`, 15, 69);
-            doc.text(`✔ Estimated Returns (\u20B9): ${formatNumber(calculatedData.estimatedReturns)}`, 15, 75);
-            doc.text(`✔ Total Maturity Value (\u20B9): ${formatNumber(calculatedData.totalValue)}`, 15, 81);
+            doc.text(`-> Total Invested Amount (INR): ${formatNumber(calculatedData.totalInvested)}`, 15, 69);
+            doc.text(`-> Estimated Returns (INR): ${formatNumber(calculatedData.estimatedReturns)}`, 15, 75);
+            doc.text(`-> Total Maturity Value (INR): ${formatNumber(calculatedData.totalValue)}`, 15, 81);
 
             // Yearly Breakdown Table
-            const headers = ['Year', 'Invested (\u20B9)', 'Returns (\u20B9)', 'Total Value (\u20B9)'];
+            const headers = ['Year', 'Invested (INR)', 'Returns (INR)', 'Total Value (INR)'];
             const data = calculatedData.yearlyData.map(row => [
                 row.year,
                 formatNumber(row.invested),
@@ -435,7 +435,7 @@
                 const finalY = data.cursor.y + 10;
 
                 // Disclaimer Section (at the bottom of the table)
-                doc.setFontSize(8);
+                doc.setFontSize(10);
                 doc.setTextColor(100);
                 const disclaimer = [
                     '* Disclaimer: This calculator provides estimates only. Actual returns may vary.',
