@@ -367,23 +367,35 @@
             
             // Add title
             doc.setFontSize(20);
-            doc.text('SIP Investment Report', 105, 20, { align: 'center' });
+            doc.text('SIP Investment Report ', 105, 20, { align: 'center', color: 'blue' });
             
             // Add summary
             doc.setFontSize(12);
-            doc.text('Input Parameters:', 15, 30);
-            doc.text(`Monthly Investment: ${formatNumber(calculatedData.monthlyInvestment)}`, 15, 40);
-            doc.text(`Investment Period: ${calculatedData.investmentPeriod} years`, 15, 45);
-            doc.text(`Expected Return: ${calculatedData.expectedReturn}% p.a.`, 15, 50);
-            doc.text(`Top-up Percentage: ${calculatedData.topUpPercentage}% p.a.`, 15, 55);
+            doc.text('Input Parameters =>', 15, 30,{ align: 'left', color: 'blue' });
+            doc.setFontSize(10);
+            doc.text(`A. Monthly Investment(₹) : ${formatNumber(calculatedData.monthlyInvestment)}`, 15, 40);
+            doc.text(`B. Investment Period : ${calculatedData.investmentPeriod} years`, 15, 45);
+            doc.text(`C. Expected Return(₹) : ${calculatedData.expectedReturn}% p.a.`, 15, 50);
+            doc.text(`D. Top-up Percentage : ${calculatedData.topUpPercentage}% p.a.`, 15, 55);
+
+            doc.setFontSize(12);
+            doc.text('Summary Results => ', 15, 70,{ align: 'left', color: 'blue' });
+            doc.setFontSize(10);
+            doc.text(`# Total Invested Amount(₹) : ${formatNumber(calculatedData.totalInvested)}`, 15, 80);
+            doc.text(`# Estimated Returns(₹) : ${formatNumber(calculatedData.estimatedReturns)}`, 15, 85);
+            doc.text(`# Total Value(₹) : ${formatNumber(calculatedData.totalValue)}`, 15, 90);
+
+            // Add Desclaimer
+            doc.setFontSize(6);
+            doc.text('* Disclaimer: This calculator provides estimates only. Actual returns may vary. Past performance is not indicative of future returns.', 15, 95);
+            doc.text('Mutual fund investments are subject to market risks. Read all scheme-related documents carefully.', 15, 99); 
+            doc.text('This tool is for educational purposes only and is not intended as investment advice.', 15, 103);
+            doc.text('All calculations are based on the provided inputs and assumptions regarding returns. Not affiliated with any financial institution.', 15, 107);
+            doc.text('Dipankar Adhikary is not liable for any discrepancies or losses arising from the use of this calculator. *', 15, 111);
             
-            doc.text('Summary Results:', 15, 70);
-            doc.text(`Total Invested Amount: ${formatNumber(calculatedData.totalInvested)}`, 15, 80);
-            doc.text(`Estimated Returns: ${formatNumber(calculatedData.estimatedReturns)}`, 15, 85);
-            doc.text(`Total Value: ${formatNumber(calculatedData.totalValue)}`, 15, 90);
             
             // Add yearly breakdown table
-            const headers = ['Year', 'Invested', 'Returns', 'Total Value'];
+            const headers = ['Year', 'Invested(₹)', 'Returns(₹)', 'Total Value(₹)'];
             const data = calculatedData.yearlyData.map(row => [
                 row.year,
                 formatNumber(row.invested),
@@ -421,14 +433,7 @@
                 margin: { top: 125 }
             });
 
-            // Add Desclaimer
-            doc.setFontSize(8);
-            doc.text('Disclaimer: This calculator provides estimates only. Actual returns may vary. Past performance is not indicative of future returns.', 15, 150);
-            doc.text('Mutual fund investments are subject to market risks. Read all scheme-related documents carefully.', 15, 153); 
-            doc.text('This tool is for educational purposes only and is not intended as investment advice.', 15, 156);
-            doc.text('All calculations are based on the provided inputs and assumptions regarding returns. Not affiliated with any financial institution.', 15, 159);
-            doc.text('Dipankar Adhikary is not liable for any discrepancies or losses arising from the use of this calculator.', 15, 162);
-            
+
             // Save PDF
             doc.save('SIP-Report.pdf');
         }
