@@ -382,12 +382,6 @@
             doc.text(`Estimated Returns: ${formatNumber(calculatedData.estimatedReturns)}`, 15, 85);
             doc.text(`Total Value: ${formatNumber(calculatedData.totalValue)}`, 15, 90);
             
-            // Add chart image placeholder
-            doc.setFillColor(240, 240, 240);
-            doc.rect(15, 105, 180, 80, 'F');
-            doc.setTextColor(100, 100, 100);
-            doc.text('Investment Growth Chart', 105, 145, { align: 'center' });
-            
             // Add yearly breakdown table
             const headers = ['Year', 'Invested', 'Returns', 'Total Value'];
             const data = calculatedData.yearlyData.map(row => [
@@ -429,7 +423,7 @@
 
             // Add Desclaimer
             doc.setFontSize(8);
-            doc.text('Disclaimer: This calculator provides estimates only. Actual returns may vary. Past performance is not indicative of future returns. Mutual fund investments are subject to market risks. Read all scheme-related documents carefully. This tool is for educational purposes only and is not intended as investment advice. All calculations are based on the provided inputs and assumptions regarding returns. Developed by Dipankar Adhikary | Not affiliated with any financial institution. Dipankar Adhikary is not liable for any discrepancies or losses arising from the use of this calculator.', 15, 90);
+            doc.text('Disclaimer: This calculator provides estimates only. Actual returns may vary. Past performance is not indicative of future returns. Mutual fund investments are subject to market risks. Read all scheme-related documents carefully. This tool is for educational purposes only and is not intended as investment advice. All calculations are based on the provided inputs and assumptions regarding returns. Developed by Dipankar Adhikary | Not affiliated with any financial institution. Dipankar Adhikary is not liable for any discrepancies or losses arising from the use of this calculator.', 15, 150);
             
             // Save PDF
             doc.save('SIP-Report.pdf');
