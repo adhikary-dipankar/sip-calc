@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         .glass-effect {
@@ -18,10 +19,8 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
         }
-        .gradient-bg {
-            background: linear-gradient(135deg, #3a41c8 0%, #6f23b8 50%, #d51e5a 100%);
-            background-size: 200% 200%;
-            animation: gradient 15s ease infinite;
+        body {
+            background: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
         }
         @keyframes gradient {
             0% { background-position: 0% 50%; }
@@ -46,48 +45,51 @@
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen p-4 md:p-8 text-white">
-    <div class="max-w-6xl mx-auto">
+<body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold mb-2">Advanced SIP Calculator</h1>
-            <p class="text-lg opacity-90">Calculate your Systematic Investment Plan returns with top-up and year-wise breakdown</p>
+            <h1 class="text-4xl font-bold mb-2 text-indigo-600">SIP CalC</h1>
+            <p class="text-sm opacity-90 text-gray-600">Calculate your Systematic Investment Plan returns with top-up and year-wise breakdown</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <!-- Input Section -->
-            <div class="glass-effect p-6 lg:col-span-2 hover-effect">
-                <h2 class="text-2xl font-semibold mb-4">Investment Details</h2>
+            <!-- Input Section-->
+            <div class="bg-gray-100 p-6 lg:col-span-2 shadow-lg rounded-xl border border-gray-200 hover:shadow-xl transition-shadow">
+                <h2 class="text-2xl font-semibold mb-4 text-center text-indigo-600">Investment Details</h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="block mb-1 text-sm">Monthly Investment (₹)</label>
+                        <label class="block mb-1 text-sm text-blue-800">Monthly Investment (₹)</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-300">₹</span>
-                            <input type="number" id="monthlyInvestment" class="w-full pl-8 p-3 rounded-lg bg-gray-800 bg-opacity-50 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all duration-300" value="5000">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">₹</span>
+                            <input type="number" id="monthlyInvestment" class="w-full pl-8 p-3 rounded-lg bg-white-500 bg-opacity-50 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all duration-300" value="5000">
                         </div>
                     </div>
                     <div>
-                        <label class="block mb-1 text-sm">Investment Period (Years)</label>
-                        <input type="number" id="investmentPeriod" class="w-full p-3 rounded-lg bg-gray-800 bg-opacity-50 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" value="10">
+                        <label class="block mb-1 text-sm text-blue-800">Investment Period (Years)</label>
+                        <input type="number" id="investmentPeriod" class="w-full p-3 rounded-lg bg-white-600 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" value="10">
                     </div>
                     <div>
-                        <label class="block mb-1 text-sm">Expected Return Rate (% p.a.)</label>
-                        <input type="number" id="expectedReturn" class="w-full p-3 rounded-lg bg-gray-800 bg-opacity-50 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" value="12">
+                        <label class="block mb-1 text-sm text-blue-800">Expected Return Rate (% p.a.)</label>
+                        <input type="number"  id="expectedReturn" class="w-full p-3 rounded-lg bg-white-700 bg-opacity-50 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" value="12">
                     </div>
                     <div>
-                        <label class="block mb-1 text-sm">Top-up Percentage (% p.a.)</label>
-                        <input type="number" id="topUpPercentage" class="w-full p-3 rounded-lg bg-gray-800 bg-opacity-50 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" value="10">
-                        <p class="text-xs mt-1 opacity-70">Your SIP amount will increase by this percentage every year</p>
+                        <label class="block mb-1 text-sm text-blue-800">Top-up Percentage (% p.a.)</label>
+                        <input type="number" id="topUpPercentage" class="w-full p-3 rounded-lg bg-white-800 bg-opacity-50 border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" value="10">
+                        <p class="text-xs mt-1 opacity-80">Your SIP amount will increase by this percentage every year</p>
                     </div>
-                    <button onclick="calculateSIP()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-medium transition duration-200">
+                    <div class="text-center">
+                    <button onclick="calculateSIP()" class="w-60 bg-indigo-400 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg font-medium transition duration-200 text-center">
                         Calculate
                     </button>
+                    </div>
+
                 </div>
-            </div>
+            </div> 
 
             <!-- Results Section -->
-            <div class="glass-effect p-6 lg:col-span-3 hover-effect">
+            <div class="bg-white-200 p-6 lg:col-span-3 shadow-lg rounded-xl border border-gray-200">
                 <!-- Multi-Fund Comparison Section -->
-                <div class="mb-8 p-4 bg-gray-800 bg-opacity-30 rounded-lg">
+                <!-- <div class="mb-8 p-4 bg-indigo-400 bg-opacity-30 rounded-lg">
                     <h3 class="text-xl font-semibold mb-3">Compare Multiple Funds</h3>
                     <div class="flex flex-wrap gap-3 mb-4" id="fundInputs">
                         <div class="flex-grow">
@@ -105,9 +107,13 @@
                     <div class="relative h-64">
                         <canvas id="comparisonChart"></canvas>
                     </div>
-                </div>
+                </div> -->
+
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-semibold">Results</h2>
+
+                    <div class="flex bg-blue-500 rounded-lg ">
+                        <h3 class="px-20 py-1 font-medium text-center text-white text-lg">SIP Growth Results</h3>
+                    </div>
                     <div class="flex space-x-2">
                         <button onclick="exportToPDF()" class="bg-pink-600 hover:bg-pink-700 text-white py-2 px-3 rounded-lg text-sm transition duration-200">
                             Export PDF
@@ -120,38 +126,40 @@
 
                 <!-- Summary Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg invested-amount">
-                        <p class="text-gray-300 text-sm">Invested Amount</p>
-                        <p id="totalInvested" class="text-2xl font-bold">₹0</p>
+                    <div class="bg-cyan-500 p-4 rounded-lg shadow-sm invested-amount border border-gray-200">
+                        <p class="text-black text-sm font-bold">Invested Amount</p>
+                        <p id="totalInvested" class="text-xl font-bold text-white">₹0</p>
                     </div>
-                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg estimated-returns">
-                        <p class="text-gray-300 text-sm">Estimated Returns</p>
-                        <p id="estimatedReturns" class="text-2xl font-bold">₹0</p>
+                    <div class="bg-green-600 p-4 rounded-lg shadow-sm estimated-returns border border-gray-200">
+                        <p class="text-black text-sm font-bold">Estimated Returns</p>
+                        <p id="estimatedReturns" class="text-xl font-bold text-white">₹0</p>
                     </div>
-                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg total-value">
-                        <p class="text-gray-300 text-sm">Total Value</p>
-                        <p id="totalValue" class="text-2xl font-bold">₹0</p>
+                    <div class="bg-indigo-500 bg-opacity-80 p-4 rounded-lg total-value">
+                        <p class="text-white text-sm font-bold">Total Value</p>
+                        <p id="totalValue" class="text-xl font-bold text-black">₹0</p>
                     </div>
                 </div>
 
                 <!-- Chart -->
-                <div class="mb-6">
-                    <canvas id="sipChart" height="250"></canvas>
+                <div class="mb-6 bg-gradient-to-r from-gray-600 to-gray-900 rounded-lg shadow-lg">
+                    <canvas id="sipChart" height="250" class="w-full"></canvas>
                 </div>
 
                 <!-- Year-wise Breakdown -->
                 <div class="overflow-x-auto">
-                    <h3 class="text-lg font-medium mb-3">Year-wise Breakdown</h3>
-                    <table class="w-full bg-gray-800 bg-opacity-50 rounded-lg overflow-hidden">
-                        <thead class="bg-gray-900 bg-opacity-50">
+                    <div class="p-1 mb-3 bg-blue-500 rounded-lg ">
+                        <h3 class="text-lg font-medium mb-3 text-center text-white">Year-wise Breakdown</h3>
+                    </div>
+                    <table class="w-full  rounded-lg overflow-hidden shadow">
+                        <thead>
                             <tr>
-                                <th class="p-3 text-left">Year</th>
-                                <th class="p-3 text-right">Invested</th>
-                                <th class="p-3 text-right">Returns</th>
-                                <th class="p-3 text-right">Total Value</th>
+                                <th class="p-3 text-center rounded-lg bg-gray-600 text-white">Year</th>
+                                <th class="p-3 text-center rounded-lg bg-cyan-500 text-white">Invested</th>
+                                <th class="p-3 text-center rounded-lg bg-green-500 text-white">Returns</th>
+                                <th class="p-3 text-center rounded-lg bg-indigo-400 text-white">Total Value</th>
                             </tr>
                         </thead>
-                        <tbody id="yearlyBreakdown" class="divide-y divide-gray-700">
+                        <tbody id="yearlyBreakdown" class="divide-y rounded-lg bg-gray-400">
                             <!-- Data will be inserted here -->
                         </tbody>
                     </table>
@@ -159,8 +167,14 @@
             </div>
         </div>
 
-        <footer class="mt-12 text-center text-sm opacity-70">
-            <p>Disclaimer: This calculator provides estimates only. Actual returns may vary.</p>
+        <footer class="mt-12 text-center text-sm text-white p-6 bg-gray-700 rounded-lg">
+            <p class="mb-4">Disclaimer: This calculator provides estimates only. Actual returns may vary. Past performance is not indicative of future returns.</p>
+            <p class="mb-2 text-xs">Mutual fund investments are subject to market risks, read all scheme related documents carefully.</p>
+            <p class="mb-2 text-xs">This tool is for educational purposes only and not intended as investment advice.</p>
+            <p class="mb-2 text-xs">All calculations are based on the inputs provided and assumptions about returns.</p>
+            <p class="text-xs mt-4">Developed by Dipankar Adhikary | Not affiliated with any financial institution.</p>
+            <p class="text-xs mt-2">Dipankar Adhikary is not liable for any discrepancies or losses arising from use of this calculator.</p>
+            <p class="text-xs mt-2">© 2025 SIP Calculator | All rights reserved</p>
         </footer>
     </div>
 
@@ -245,12 +259,12 @@
             
             yearlyData.forEach(data => {
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-700 hover:bg-opacity-30';
+                row.className = 'hover:bg-indigo-600 hover:bg-opacity-70 rounded-lg text-white';
                 row.innerHTML = `
-                    <td class="p-3">${data.year}</td>
-                    <td class="p-3 text-right">₹${formatNumber(data.invested)}</td>
-                    <td class="p-3 text-right">₹${formatNumber(data.returns)}</td>
-                    <td class="p-3 text-right">₹${formatNumber(data.totalValue)}</td>
+                    <td class="p-3 text-center rounded-[14px]">${data.year}</td>
+                    <td class="p-3 text-center rounded-lg">₹${formatNumber(data.invested)}</td>
+                    <td class="p-3 text-center rounded-lg">₹${formatNumber(data.returns)}</td>
+                    <td class="p-3 text-center rounded-lg">₹${formatNumber(data.totalValue)}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -345,7 +359,11 @@
             }
             
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
             
             // Add title
             doc.setFontSize(20);
@@ -364,9 +382,11 @@
             doc.text(`Estimated Returns: ₹${formatNumber(calculatedData.estimatedReturns)}`, 15, 85);
             doc.text(`Total Value: ₹${formatNumber(calculatedData.totalValue)}`, 15, 90);
             
-            // Add chart image (simplified as actual chart export would need more complex handling)
-            doc.text('Investment Growth:', 15, 105);
-            doc.text('(Chart image would be embedded here in full implementation)', 15, 115);
+            // Add chart image placeholder
+            doc.setFillColor(240, 240, 240);
+            doc.rect(15, 105, 180, 80, 'F');
+            doc.setTextColor(100, 100, 100);
+            doc.text('Investment Growth Chart', 105, 145, { align: 'center' });
             
             // Add yearly breakdown table
             const headers = ['Year', 'Invested', 'Returns', 'Total Value'];
@@ -378,12 +398,33 @@
             ]);
             
             doc.autoTable({
-                startY: 125,
                 head: [headers],
                 body: data,
-                theme: 'grid',
-                headStyles: { fillColor: [59, 130, 246] },
-                styles: { font: 'helvetica', fontSize: 10 }
+                startY: 125,
+                styles: {
+                    cellPadding: 5,
+                    fontSize: 10,
+                    valign: 'middle',
+                    halign: 'left' // left, center, right
+                },
+                headStyles: {
+                    fillColor: [30, 64, 175],
+                    textColor: 255,
+                    fontSize: 10,
+                    fontStyle: 'bold',
+                    halign: 'center'
+                },
+                bodyStyles: {
+                    textColor: [31, 41, 55],
+                    cellPadding: 4
+                },
+                columnStyles: {
+                    0: { halign: 'left' }, // Year column
+                    1: { halign: 'right' }, // Invested column
+                    2: { halign: 'right' }, // Returns column
+                    3: { halign: 'right' } // Total Value column
+                },
+                margin: { top: 125 }
             });
             
             // Save PDF
